@@ -31,7 +31,11 @@ internal class MongoDBConnection
 
     public MongoDBConnection(String Database, String UserName, String Password)
     {
-        
+        this._databaseName = Database;
+        this._username = UserName;
+        this._password = Password;
+
+        this.Initialize();
     }
 
     /// <summary>
@@ -48,10 +52,13 @@ internal class MongoDBConnection
 
     private protected void Initialize()
     {
-        // Replace the uri string with your MongoDB deployment's connection string.
-        var client = new MongoClient($"mongodb+srv://{_username}:{_password}@<cluster-address>/test?w=majority");
-        this._mongoClient = client;
-        this._mongoDatabase = client.GetDatabase(_databaseName);
+        if(!IsEmptyOrNull(_databaseName) && !IsEmptyOrNull(_username) && !IsEmptyOrNull(_password))
+        {
+            // Replace the uri string with your MongoDB deployment's connection string.
+            var client = new MongoClient($"mongodb+srv://{_username}:{_password}@<cluster-address>/test?w=majority");
+            this._mongoClient = client;
+            this._mongoDatabase = client.GetDatabase(_databaseName);
+        }
     }
 
     private protected void Dispose()
@@ -62,6 +69,31 @@ internal class MongoDBConnection
     #endregion
 
     #region Public methods
+
+    public async Boolean AddValues(String CollectionName, Object Values)
+    {
+        try
+        {
+            //get mongodb collection
+            var collection = this._mongoDatabase.GetCollection<Entity>("CollectionName");
+            await collection.InsertOneAsync(Values);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message, ex)
+        }
+    }
+
+    public Boolean UpdateValues(String CollectionName, Object Values)
+    {
+
+    }
+
+    public Boolean DeleteValue(String CollectionName, Object Id)
+    {
+
+    }
 
     #endregion
 
